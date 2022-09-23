@@ -2,7 +2,7 @@ start-frontend:
 	make -C frontend start
 
 start-backend:
-	npx start-server
+	npx start-server -p 5100
 
 start:
 	make start-backend & make start-frontend
@@ -15,7 +15,3 @@ lint-frontend:
 
 install:
 	npm ci
-
-build:
-	npm run build
-	npm run start
