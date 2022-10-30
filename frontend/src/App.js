@@ -1,4 +1,4 @@
-import React, { useContext, createContext, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
@@ -6,41 +6,75 @@ import {
   Link,
   Redirect,
 } from 'react-router-dom';
-import Login from './components/Login.jsx';
-import Error from './components/Error.jsx';
+import { Button, Navbar } from 'react-bootstrap';
+import LoginPage from './components/LoginPage.jsx';
+import AuthContext from './context/AuthContext.jsx';
+import NoMatch from './components/NoMatch.jsx';
+import useAuth from './hooks/Auth.jsx';
 
-export default function App() {
+const AuthProvider = ({ children }) => {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const logIn = () => setLoggedIn(true);
+  const logOut = () => {
+    localStorage.removeItem('userId');
+    setLoggedIn(false);
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem('userId')) {
+      logIn();
+    }
+  });
+
   return (
-    <Router>
-      <header>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/signup">Регистрация</Link>
-            </li>
-            <li>
-              <Link to="/login">Hexlet Chat</Link>
-            </li>
-          </ul>
-        </nav>
-      </header>
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
+    <AuthContext.Provider value={{ loggedIn, logIn, logOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
-      <main>
+const LoginRoute = () => {
+  const auth = useAuth();
+
+  return auth.loggedIn ? <div>Chat</div> : <Redirect to="/login" />;
+};
+
+const AuthButton = () => {
+  const auth = useAuth();
+  return auth.loggedIn ? <Button onClick={auth.logOut}>Выйти</Button> : null;
+};
+
+const App = () => (
+  <div className="d-flex flex-column h-100">
+    <AuthProvider>
+      <Router>
+        <Navbar bg="white" expand="lg" className="shadow-sm">
+          <div className="container">
+            <Navbar.Brand as={Link} to="/">Hexlet Chat</Navbar.Brand>
+            <AuthButton />
+          </div>
+        </Navbar>
         <Switch>
+          <Route exact path="/">
+            <LoginRoute />
+          </Route>
           <Route path="/login">
-            <Login />
+            <LoginPage />
           </Route>
           <Route path="/signup">
-            <Home />
+            <Signup />
           </Route>
-          <Route path="/">
-            <Error />
+          <Route path="*">
+            <NoMatch />
           </Route>
-          <Redirect to="/error" />
         </Switch>
-      </main>
-    </Router>
-  );
-}
+      </Router>
+    </AuthProvider>
+  </div>
+);
 
-const Home = () =><div>Home</div>;
+const Signup = () => <div>Signup</div>;
+
+export default App;
