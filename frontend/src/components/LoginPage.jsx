@@ -2,26 +2,18 @@ import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { useFormik } from 'formik';
 import { Button, Form } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import * as Yup from 'yup';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/Auth.jsx';
-import Pic from '../pictures/pic.1.jpeg';
+import Pic from '../pictures/avatar1.jpg';
+import routes from '../routes.js';
 
 const LoginPage = () => {
   const [authFailed, setAuthFailed] = useState(false);
   const inputRef = useRef();
   const auth = useAuth();
-
-  const SignupSchema = Yup.object().shape({
-    username: Yup.string()
-      .required('Введите Имя')
-      .min(3, 'Имя слишком короткое')
-      .max(20, 'Имя слишком длинное'),
-    password: Yup.string()
-      .required('Введите пароль')
-      .min(3, 'Пароль слишком короткий')
-      .max(20, 'Пароль слишком длинный'),
-  });
+  const location = useLocation();
+  const navigate = useNavigate();
+  console.log(routes.login())
 
   useEffect(() => {
     inputRef.current.focus();
@@ -33,15 +25,16 @@ const LoginPage = () => {
       password: '',
     },
 
-    validationSchema: SignupSchema,
-
     onSubmit: async (values) => {
       setAuthFailed(false);
 
       try {
-        const res = await axios.post('/api/v1/login', values);
+        const res = await axios.post(routes.login(), values);
         localStorage.setItem('userId', JSON.stringify(res.data.token));
         auth.logIn();
+        console.log(res);
+        const { from } = location.state || { from: { pathname: '/' } };
+        navigate(from);
       } catch (err) {
         formik.setSubmitting(false);
         if (err.isAxiosError && err.response.status === 401) {
@@ -65,7 +58,7 @@ const LoginPage = () => {
               <Form onSubmit={formik.handleSubmit} className="col-12 col-md-6 mt-3 mt-mb-0">
                 <h1 className="text-center mb-4">Войти</h1>
                 <Form.Group className="form-floating mb-3">
-                  <Form.Label htmlFor="username">Username</Form.Label>
+                  <Form.Label htmlFor="username">Имя ползователя</Form.Label>
                   <Form.Control
                     onChange={formik.handleChange}
                     value={formik.values.username}
@@ -74,18 +67,14 @@ const LoginPage = () => {
                     name="username"
                     id="username"
                     autoComplete="username"
-                    isInvalid={
-                      formik.touched.username && formik.errors.username
-                        ? true : authFailed
-                      }
+                    isInvalid={authFailed}
                     required
                     ref={inputRef}
                     disabled={formik.isSubmitting}
                   />
-                  <Form.Control.Feedback type="invalid">{formik.errors.username}</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="form-floating mb-4">
-                  <Form.Label htmlFor="password">Password</Form.Label>
+                  <Form.Label htmlFor="password">Пароль</Form.Label>
                   <Form.Control
                     type="password"
                     onChange={formik.handleChange}
@@ -95,16 +84,13 @@ const LoginPage = () => {
                     name="password"
                     id="password"
                     autoComplete="current-password"
-                    isInvalid={
-                      formik.touched.password && formik.errors.password
-                        ? true : authFailed
-                      }
+                    isInvalid={authFailed}
                     required
                     disabled={formik.isSubmitting}
                   />
-                  <Form.Control.Feedback type="invalid">{formik.touched.password && formik.errors.password ? formik.errors.password : 'Неверные имя пользователя или пароль'}</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">Неверные имя пользователя или пароль</Form.Control.Feedback>
                 </Form.Group>
-                <Button className="w-100 mb-3 btn btn-outline-primary" type="submit" disabled={formik.isSubmitting} variant="outline-primary">Submit</Button>
+                <Button className="w-100 mb-3 btn btn-outline-primary" type="submit" disabled={formik.isSubmitting} variant="outline-primary">Войти</Button>
               </Form>
             </div>
             <div className="card-footer p-4">

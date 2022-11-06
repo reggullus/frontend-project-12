@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
-  Switch,
   Route,
   Link,
-  Redirect,
+  Routes,
+  Navigate,
+  useLocation,
 } from 'react-router-dom';
 import { Button, Navbar } from 'react-bootstrap';
-import LoginPage from './components/LoginPage.jsx';
-import AuthContext from './context/AuthContext.jsx';
-import NoMatch from './components/NoMatch.jsx';
 import useAuth from './hooks/Auth.jsx';
+import AuthContext from './context/AuthContext.jsx';
+import LoginPage from './components/LoginPage.jsx';
+import SignupPage from './components/SignupPage.jsx';
+import NoMatch from './components/NoMatch.jsx';
 
 const AuthProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -37,8 +39,9 @@ const AuthProvider = ({ children }) => {
 
 const LoginRoute = () => {
   const auth = useAuth();
+  const location = useLocation();
 
-  return auth.loggedIn ? <div>Chat</div> : <Redirect to="/login" />;
+  return auth.loggedIn ? <div>Chat</div> : <Navigate to="/login" state={{ from: location }} />;
 };
 
 const AuthButton = () => {
@@ -56,25 +59,15 @@ const App = () => (
             <AuthButton />
           </div>
         </Navbar>
-        <Switch>
-          <Route exact path="/">
-            <LoginRoute />
-          </Route>
-          <Route path="/login">
-            <LoginPage />
-          </Route>
-          <Route path="/signup">
-            <Signup />
-          </Route>
-          <Route path="*">
-            <NoMatch />
-          </Route>
-        </Switch>
+        <Routes>
+          <Route path="/" element={<LoginRoute />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="*" element={<NoMatch />} />
+        </Routes>
       </Router>
     </AuthProvider>
   </div>
 );
-
-const Signup = () => <div>Signup</div>;
 
 export default App;
