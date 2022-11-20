@@ -13,21 +13,16 @@ import AuthContext from './context/AuthContext.jsx';
 import LoginPage from './components/LoginPage.jsx';
 import SignupPage from './components/SignupPage.jsx';
 import NoMatch from './components/NoMatch.jsx';
+import Chat from './components/Chat.jsx';
 
 const AuthProvider = ({ children }) => {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem('userId'));
 
   const logIn = () => setLoggedIn(true);
   const logOut = () => {
     localStorage.removeItem('userId');
     setLoggedIn(false);
   };
-
-  useEffect(() => {
-    if (localStorage.getItem('userId')) {
-      logIn();
-    }
-  });
 
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
@@ -37,11 +32,11 @@ const AuthProvider = ({ children }) => {
   );
 };
 
-const LoginRoute = () => {
+const PrivateRoute = ({ children }) => {
   const auth = useAuth();
   const location = useLocation();
 
-  return auth.loggedIn ? <div>Chat</div> : <Navigate to="/login" state={{ from: location }} />;
+  return auth.loggedIn ? children : <Navigate to="/login" state={{ from: location }} />;
 };
 
 const AuthButton = () => {
@@ -60,7 +55,14 @@ const App = () => (
           </div>
         </Navbar>
         <Routes>
-          <Route path="/" element={<LoginRoute />} />
+          <Route
+            path="/"
+            element={(
+              <PrivateRoute>
+                <Chat />
+              </PrivateRoute>
+          )}
+          />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="*" element={<NoMatch />} />

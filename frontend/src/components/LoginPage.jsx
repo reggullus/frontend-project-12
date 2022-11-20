@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { Button, Form } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/Auth.jsx';
-import Pic from '../pictures/avatar1.jpg';
+import Pic from '../images/avatar3.jpeg';
 import routes from '../routes.js';
 
 const LoginPage = () => {
@@ -13,7 +13,6 @@ const LoginPage = () => {
   const auth = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  console.log(routes.login())
 
   useEffect(() => {
     inputRef.current.focus();
@@ -32,7 +31,7 @@ const LoginPage = () => {
         const res = await axios.post(routes.login(), values);
         localStorage.setItem('userId', JSON.stringify(res.data.token));
         auth.logIn();
-        console.log(res);
+
         const { from } = location.state || { from: { pathname: '/' } };
         navigate(from);
       } catch (err) {
@@ -53,7 +52,7 @@ const LoginPage = () => {
           <div className="card shadow-sm">
             <div className="card-body row p-5">
               <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
-                <img src={Pic} className="rounded-circle" alt="Войти" />
+                <img src={Pic} className="rounded-circle img-fluid  img-thumbnail" alt="Войти" />
               </div>
               <Form onSubmit={formik.handleSubmit} className="col-12 col-md-6 mt-3 mt-mb-0">
                 <h1 className="text-center mb-4">Войти</h1>

@@ -5,7 +5,7 @@ import { Button, Form } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import useAuth from '../hooks/Auth.jsx';
-import Pic from '../pictures/avatar2.jpg';
+import Pic from '../images/avatar5.jpg';
 import routes from '../routes.js';
 
 const Signup = () => {
@@ -70,7 +70,7 @@ const Signup = () => {
           <div className="card shadow-sm">
             <div className="card-body d-flex flex-column flex-md-row justify-content-around align-items-center p-5">
               <div>
-                <img src={Pic} className="rounded-circle" alt="Регистрация" />
+                <img src={Pic} className="rounded-circle img-fluid img-thumbnail" width="80%" alt="Регистрация" />
               </div>
               <Form onSubmit={formik.handleSubmit} className="w-50">
                 <h1 className="text-center mb-4">Регистрация</h1>
